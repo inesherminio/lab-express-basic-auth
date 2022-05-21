@@ -19,7 +19,8 @@ router.get("/logout", (req, res) => {
 	})
 })
 
-router.use(isLoggedOut);
+/* No need to do router.use, just requiring it is enough */
+//router.use(isLoggedOut);
 
 router.get("/singup", displaySingup);
 //*calling render function
@@ -101,7 +102,8 @@ router.post('/singin', isLoggedOut, async (req, res, next) => {
 
 });
 
-router.use(isLoggedIn);
+/* Do your private routes on the private routes file. If you named this file auth.routes then use it only for auth, for organization */
+//router.use(isLoggedIn);
 
 router.get('/main', isLoggedIn, (req, res) => {
     res.render('auth/main');

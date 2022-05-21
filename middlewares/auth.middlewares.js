@@ -8,3 +8,5 @@ module.exports = {
     }
   },
 };
+
+/* This file does the same as the isLoggedIn.js. I would suggest you keep this one and put all the auth middlewares here, like the isLoggedOut */
