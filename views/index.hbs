@@ -1,2 +1,10 @@
 <h1>{{title}}</h1>
 <p>Welcome to {{title}}</p>
+{{#if isLoggedIn}}
+	<li><a href="/userProfile">Profile</a></li>
+	<li><a href="/logout">Logout</a></li>
+ {{else}}
+	<li><a href="/signin">Signin</a></li>
+	<li><a href="/signup">Signup</a></li>
+   {{/if}}
+    <li><a href="/">Home</a></li>
