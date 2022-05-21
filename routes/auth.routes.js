@@ -11,7 +11,8 @@ router.get("/sign-up", (req, res, next) => {
 router.post("/sign-up", async (req, res, next) => {
   // extract username and password from req.body
   const { username, password } = req.body;
-  console.log(req.body);
+  /* When doing projects, avoid console logging passwords and sensitive data */
+  //console.log(req.body);
   // check if email or password entered
   if (!username || !password) {
     const errorMessage = `E-Mail or password incorrect`;

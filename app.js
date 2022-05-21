@@ -27,8 +27,6 @@ const capitalized = (string) =>
 
 app.locals.title = `${capitalized(projectName)}- Generated with Ironlauncher`;
 
-const userToProfile = require("./middlewares/auth.middlewares");
-
 // 👇 Start handling routes here
 const index = require("./routes/index");
 app.use("/", index);
@@ -37,8 +35,11 @@ app.use("/", index);
 const authApp = require("./routes/auth.routes");
 app.use("/auth/", authApp);
 
+/* As a plus, just so that you have another tool, when defining prefixes, like the private area, you can apply the 
+middlewares. If you apply it here, all of the routes in that file will have the middleware. Simplifies! P.s. if using it here, dont forget to import it. */
 const privateArea = require("./routes/private");
 app.use("/auth/private", privateArea);
+//app.use("/auth/private", isLoggedIn, privateArea);
 
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require("./error-handling")(app);
