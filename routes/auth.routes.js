@@ -1,23 +1,23 @@
-const router = require('express').Router();
+const router = require("express").Router();
 const bcrypt = require("bcryptjs");
-const User = require('../models/User.model');
-const isLoggedOut = require('../middlewares/isLoggedOut');
-const isLoggedIn = require('../middlewares/isLoggedIn');
+const User = require("../models/User.model");
+const isLoggedOut = require("../middlewares/isLoggedOut");
+const isLoggedIn = require("../middlewares/isLoggedIn");
 
 const displaySingup = (req, res) => res.render("auth/singup");
 //*function to render singup view
 
 //*logout
 router.get("/logout", (req, res) => {
-	req.session.destroy((error) => {
-		if (error) {
-            const errorMessage = error.message;
-            res.render("auth/logout", {errorMessage});
-            return
-		}
-		res.redirect("/");
-	})
-})
+  req.session.destroy((error) => {
+    if (error) {
+      const errorMessage = error.message;
+      res.render("auth/logout", { errorMessage });
+      return;
+    }
+    res.redirect("/");
+  });
+});
 
 router.use(isLoggedOut);
 
@@ -25,90 +25,94 @@ router.get("/singup", displaySingup);
 //*calling render function
 
 router.post("/singup", async (req, res, next) => {
-    const { username, password } = req.body;
+  const { username, password } = req.body;
 
-    if(!password || !username) {
-        const errorMessage = 'Your password or username are not valid';
-        res.render("auth/singup", {errorMessage});
-        return
-        //*display error message if theres no password or no username.
+  if (!password || !username) {
+    const errorMessage = "Your password or username are not valid";
+    res.render("auth/singup", { errorMessage });
+    return;
+    //*display error message if theres no password or no username.
+  }
+
+  try {
+    const foundUser = await User.findOne({ username }); //*check if user exist in db
+    if (foundUser) {
+      const errorMessage = "You are already registered!";
+      res.render("auth/singup", { errorMessage });
+      return;
+      //*display error message if the user is already registered in db.
     }
 
-    try {
-      const foundUser = await User.findOne({ username }); //*check if user exist in db
-        if (foundUser) {
-            const errorMessage = 'You are already registered!'
-            res.render("auth/singup", { errorMessage });
-            return
-            //*display error message if the user is already registered in db.
-        }
+    const hashedPassword = bcrypt.hashSync(password, 12);
+    const createdUser = await User.create({
+      username,
+      password: hashedPassword,
+    });
 
-        const hashedPassword = bcrypt.hashSync(password, 12);
-        const createdUser = await User.create({
-            username,
-            password: hashedPassword
-        })
-        
-        res.redirect("/singin");
-    } catch(error){
-        next(error);
-    }
+    /* The route is called "/signin", and not "/singin". Attention to this! */
+    res.redirect("/signin");
+  } catch (error) {
+    next(error);
+  }
 });
 
-router.get('/singin', isLoggedOut, (req, res) => {
-    res.render('auth/singin');
+router.get("/singin", isLoggedOut, (req, res) => {
+  res.render("auth/singin");
 });
 
-router.post('/singin', isLoggedOut, async (req, res, next) => {
-    const { username, password } = req.body;
+router.post("/singin", isLoggedOut, async (req, res, next) => {
+  const { username, password } = req.body;
 
-    if(!password || !username) {
-        const errorMessage = 'Please provide username and password';
-        res.render("auth/singin", { errorMessage });
-        return
-    };
+  if (!password || !username) {
+    const errorMessage = "Please provide username and password";
+    /* Attention to "/signin" and "/singin"! */
+    res.render("auth/signin", { errorMessage });
+    return;
+  }
 
-    try {
-        const foundUser = await User.findOne({ username });
-        if (!foundUser) {
-            const errorMessage = 'Wrong credentials';
-            res.render('auth/singin', { errorMessage });
-            return
-        };
-
-        const checkPassword = bcrypt.compareSync(password, foundUser.password); //*compare passwords
-        if (!checkPassword) {
-            const errorMessage = 'Wrong credentials';
-            res.render('auth/singin', { errorMessage });
-            return
-        }
-
-        const objectUser = foundUser.toObject();
-        //*transform mongo object into js object.
-
-        delete objectUser.password;
-        //*the password won't be visible in the console.
-
-        req.session.currentUser = objectUser;
-        //* to save the new user in the session.
-       // console.log('req.session.currentUser', req.session.currentUser);
-
-        return res.redirect('/');
-
-    } catch (error){
-        next(error);
+  try {
+    const foundUser = await User.findOne({ username });
+    if (!foundUser) {
+      const errorMessage = "Wrong credentials";
+      /* Attention to "/signin" and "/singin"! */
+      res.render("auth/signin", { errorMessage });
+      return;
     }
 
+    const checkPassword = bcrypt.compareSync(password, foundUser.password); //*compare passwords
+    if (!checkPassword) {
+      const errorMessage = "Wrong credentials";
+      /* Attention to "/signin" and "/singin"! */
+      res.render("auth/signin", { errorMessage });
+      return;
+    }
+
+    const objectUser = foundUser.toObject();
+    //*transform mongo object into js object.
+
+    delete objectUser.password;
+    //*the password won't be visible in the console.
+
+    req.session.currentUser = objectUser;
+    //* to save the new user in the session.
+    // console.log('req.session.currentUser', req.session.currentUser);
+
+    return res.redirect("/");
+  } catch (error) {
+    next(error);
+  }
 });
 
 router.use(isLoggedIn);
 
-router.get('/main', isLoggedIn, (req, res) => {
-    res.render('auth/main');
+router.get("/main", isLoggedIn, (req, res) => {
+  res.render("auth/main");
 });
 
-router.get('/private', isLoggedIn, (req, res) => {
-    res.render('auth/private');
+router.get("/private", isLoggedIn, (req, res) => {
+  res.render("auth/private");
 });
 
 module.exports = router;
+
+/* You cannot have a file duplicated, it has no use. I guess this one is not at use, so delete it. */

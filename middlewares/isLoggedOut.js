@@ -7,3 +7,5 @@ const isLoggedOut = (req, res, next) => {
 }
 
 module.exports = isLoggedOut
+
+/* This is also an auth middleware, so put it on the auth.middlewares file as well */

@@ -1,9 +1,11 @@
 module.exports = {
     isLoggedIn: (req, res, next) => {
-      if (req.session) {
+      /* You want to check if there is a current user on the session */
+      if (req.session.currentUser) {
         next();
       } else {
-        res.redirect("/auth/signin");
+        /* The route is only signin */
+        res.redirect("/signin");
       }
     },
   };

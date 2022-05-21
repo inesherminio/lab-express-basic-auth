@@ -7,3 +7,5 @@ const isLoggedIn = (req, res, next) => {
 }
 
 module.exports = isLoggedIn
+
+/* This file does the same as auth.middlewares.js, so you should erase it */
